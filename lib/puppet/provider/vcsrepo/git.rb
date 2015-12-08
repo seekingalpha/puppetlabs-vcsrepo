@@ -179,8 +179,13 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
   def update_references
     at_path do
       update_remotes
-      git_with_identity('fetch', @resource.value(:remote))
-      git_with_identity('fetch', '--tags', @resource.value(:remote))
+
+      depth_args = []
+      if @resource.value(:depth) and @resource.value(:depth).to_i > 0
+        depth_args.push("--depth=#{@resource.value(:depth)}")
+      end
+      git_with_identity('fetch', *depth_args, @resource.value(:remote))
+      git_with_identity('fetch', '--tags', *depth_args, @resource.value(:remote))
       update_owner_and_excludes
     end
   end
