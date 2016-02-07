@@ -409,6 +409,9 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
   # @return [String] Returns the tag/branch of the current repo if it's up to
   #                  date; otherwise returns the sha of the requested revision.
   def get_revision(rev = 'HEAD')
+    # Don’t touch :present repositories once created
+    return @resource.value(:revision) if @resource.value(:ensure) == :present
+
     if @resource.value(:source)
       update_references
     else
