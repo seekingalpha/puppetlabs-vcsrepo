@@ -307,6 +307,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
   # handle upstream branch changes
   # @!visibility private
   def checkout(revision = @resource.value(:revision))
+    puts caller if /sapi/ === @resource.value(:source).to_s
     if !local_branch_revision?(revision) && remote_branch_revision?(revision)
       #non-locally existant branches (perhaps switching to a branch that has never been checked out)
       at_path { git_with_identity('checkout', '--force', '-b', revision, '--track', "#{@resource.value(:remote)}/#{revision}") }
@@ -438,6 +439,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
       elsif local_branch_revision?
         canonical = at_path { git_with_identity('rev-parse', @resource.value(:revision)).strip }
       elsif remote_branch_revision?
+        puts caller if /sapi/ === @resource.value(:source).to_s
         canonical = at_path { git_with_identity('rev-parse', "#{@resource.value(:remote)}/#{@resource.value(:revision)}").strip }
       else
         #look for a sha (could match invalid shas)

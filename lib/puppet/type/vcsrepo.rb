@@ -58,6 +58,7 @@ Puppet::Type.newtype(:vcsrepo) do
     def insync?(is)
       @should ||= []
 
+      puts "#{should.inspect} === #{is.inspect}" if /sapi/ === @resource.value(:source).to_s
       case should
       when :present
         return true unless [:absent, :purged, :held].include?(is)
@@ -117,6 +118,7 @@ Puppet::Type.newtype(:vcsrepo) do
       prov = @resource.provider
       if prov
         if prov.working_copy_exists?
+          p @should if /sapi/ === @resource.value(:source).to_s
           (@should.include?(:latest) && prov.latest?) ? :latest : :present
         elsif prov.class.feature?(:bare_repositories) and prov.bare_exists?
           :bare
